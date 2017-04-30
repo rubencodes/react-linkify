@@ -34,13 +34,14 @@ function findMatches(text) {
 class Linkify extends React.Component {
   static MATCH = 'LINKIFY_MATCH'
   static propTypes = {
-    tagName: React.propTypes.string,
+    tagName: React.PropTypes.string,
     className: React.PropTypes.string,
     component: React.PropTypes.any,
     children: React.PropTypes.any,
     properties: React.PropTypes.object
   }
   static defaultProps = {
+    tagName: 'span',
     className: 'Linkify',
     component: 'a',
     properties: {}
