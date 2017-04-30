@@ -29,7 +29,6 @@ function findMatches(text) {
   var matches = [];
   var match = void 0;
   while (match = pattern.exec(text)) {
-    console.log(match[0], isEmail(match[0]));
     var email = isEmail(match[0]);
     var url = email ? 'mailto:' + match[0] : match[0].startsWith('http://') || match[0].startsWith('https://') ? match[0] : 'https://' + match[0];
     var shortUrl = email ? match[0] : match[0].replace(/(https?:\/\/)?(www\.)?/, '');

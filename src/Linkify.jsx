@@ -11,7 +11,6 @@ function findMatches(text) {
   const matches = [];
   let match;
   while (match = pattern.exec(text)) {
-    console.log(match[0], isEmail(match[0]));
     const email = isEmail(match[0]);
     const url = email
       ? 'mailto:' + match[0]
