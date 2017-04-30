@@ -3,21 +3,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.linkify = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
-
-var _linkifyIt = require('linkify-it');
-
-var _linkifyIt2 = _interopRequireDefault(_linkifyIt);
-
-var _tlds = require('tlds');
-
-var _tlds2 = _interopRequireDefault(_tlds);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -27,8 +18,34 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var linkify = exports.linkify = new _linkifyIt2.default();
-linkify.tlds(_tlds2.default);
+function isEmail(email) {
+  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(email);
+}
+function findMatches(text) {
+  var urlRegex = '(?!mailto:)(?:(?:http|https|ftp)://)?(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?';
+  var pattern = new RegExp(urlRegex, 'ig');
+
+  var matches = [];
+  var match = void 0;
+  while (match = pattern.exec(text)) {
+    console.log(match[0], isEmail(match[0]));
+    var email = isEmail(match[0]);
+    var url = email ? 'mailto:' + match[0] : match[0].startsWith('http://') || match[0].startsWith('https://') ? match[0] : 'https://' + match[0];
+    var shortUrl = email ? match[0] : match[0].replace(/(https?:\/\/)?(www\.)?/, '');
+    var _text = !email && shortUrl.length > 20 ? shortUrl.slice(0, 20) + '...' : shortUrl;
+
+    matches.push({
+      index: match.index,
+      lastIndex: pattern.lastIndex,
+      url: url,
+      text: _text,
+      type: email ? 'email' : 'url'
+    });
+  }
+
+  return matches;
+}
 
 var Linkify = function (_React$Component) {
   _inherits(Linkify, _React$Component);
@@ -50,7 +67,7 @@ var Linkify = function (_React$Component) {
   _createClass(Linkify, [{
     key: 'getMatches',
     value: function getMatches(string) {
-      return linkify.match(string);
+      return findMatches(string);
     }
   }, {
     key: 'parseString',
@@ -117,9 +134,10 @@ var Linkify = function (_React$Component) {
     value: function render() {
       this.parseCounter = 0;
       var parsedChildren = this.parse(this.props.children);
+      var CustomTag = this.props.tagName || 'span';
 
       return _react2.default.createElement(
-        'span',
+        CustomTag,
         { className: this.props.className },
         parsedChildren
       );
@@ -131,11 +149,11 @@ var Linkify = function (_React$Component) {
 
 Linkify.MATCH = 'LINKIFY_MATCH';
 Linkify.propTypes = {
+  tagName: _react2.default.propTypes.string,
   className: _react2.default.PropTypes.string,
   component: _react2.default.PropTypes.any,
-  properties: _react2.default.PropTypes.object,
-  urlRegex: _react2.default.PropTypes.object,
-  emailRegex: _react2.default.PropTypes.object
+  children: _react2.default.PropTypes.any,
+  properties: _react2.default.PropTypes.object
 };
 Linkify.defaultProps = {
   className: 'Linkify',

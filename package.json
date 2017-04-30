@@ -39,9 +39,5 @@
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest"
-  },
-  "dependencies": {
-    "linkify-it": "^1.2.0",
-    "tlds": "^1.57.0"
   }
 }

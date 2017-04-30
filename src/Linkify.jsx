@@ -1,35 +1,58 @@
 import React from 'react';
-import LinkifyIt from 'linkify-it';
-import tlds from 'tlds';
 
-export const linkify = new LinkifyIt();
-linkify.tlds(tlds);
+function isEmail(email) {
+  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(email);
+}
+function findMatches(text) {
+  const urlRegex = '(?!mailto:)(?:(?:http|https|ftp)://)?(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?';
+  const pattern = new RegExp(urlRegex, 'ig');
+
+  const matches = [];
+  let match;
+  while (match = pattern.exec(text)) {
+    console.log(match[0], isEmail(match[0]));
+    const email = isEmail(match[0]);
+    const url = email
+      ? 'mailto:' + match[0]
+      : match[0].startsWith('http://') || match[0].startsWith('https://') ? match[0] : 'https://' + match[0];
+    const shortUrl = email ? match[0] : match[0].replace(/(https?:\/\/)?(www\.)?/, '');
+    const text = !email && shortUrl.length > 20 ? shortUrl.slice(0, 20) + '...' : shortUrl;
+
+    matches.push({
+      index: match.index,
+      lastIndex: pattern.lastIndex,
+      url,
+      text,
+      type: email ? 'email' : 'url'
+    });
+  }
+
+  return matches;
+}
 
 class Linkify extends React.Component {
   static MATCH = 'LINKIFY_MATCH'
-
   static propTypes = {
+    tagName: React.propTypes.string,
     className: React.PropTypes.string,
     component: React.PropTypes.any,
-    properties: React.PropTypes.object,
-    urlRegex: React.PropTypes.object,
-    emailRegex: React.PropTypes.object
+    children: React.PropTypes.any,
+    properties: React.PropTypes.object
   }
-
   static defaultProps = {
     className: 'Linkify',
     component: 'a',
-    properties: {},
+    properties: {}
   }
 
   parseCounter = 0
 
   getMatches(string) {
-    return linkify.match(string);
+    return findMatches(string);
   }
-
   parseString(string) {
-    let elements = [];
+    const elements = [];
     if (string === '') {
       return elements;
     }
@@ -46,8 +69,8 @@ class Linkify extends React.Component {
         elements.push(string.substring(lastIndex, match.index));
       }
       // Shallow update values that specified the match
-      let props = {href: match.url, key: `parse${this.parseCounter}match${idx}`};
-      for (let key in this.props.properties) {
+      const props = { href: match.url, key: `parse${this.parseCounter}match${idx}` };
+      for (const key in this.props.properties) {
         let val = this.props.properties[key];
         if (val === Linkify.MATCH) {
           val = match.url;
@@ -69,7 +92,6 @@ class Linkify extends React.Component {
 
     return (elements.length === 1) ? elements[0] : elements;
   }
-
   parse(children) {
     let parsed = children;
 
@@ -78,7 +100,7 @@ class Linkify extends React.Component {
     } else if (React.isValidElement(children) && (children.type !== 'a') && (children.type !== 'button')) {
       parsed = React.cloneElement(
         children,
-        {key: `parse${++this.parseCounter}`},
+        { key: `parse${++this.parseCounter}` },
         this.parse(children.props.children)
       );
     } else if (children instanceof Array) {
@@ -93,8 +115,9 @@ class Linkify extends React.Component {
   render() {
     this.parseCounter = 0;
     const parsedChildren = this.parse(this.props.children);
+    const CustomTag = this.props.tagName || 'span';
 
-    return <span className={this.props.className}>{parsedChildren}</span>;
+    return <CustomTag className={ this.props.className }>{ parsedChildren }</CustomTag>;
   }
 }
 
