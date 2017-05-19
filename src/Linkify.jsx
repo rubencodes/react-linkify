@@ -5,7 +5,7 @@ function isEmail(email) {
   return re.test(email);
 }
 function findMatches(text) {
-  const pattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/ig;
+  const pattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%_\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/ig;
 
   const matches = [];
   let match;
