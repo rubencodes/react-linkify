@@ -39,5 +39,5 @@
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest"
-  }n
+  }
 }
