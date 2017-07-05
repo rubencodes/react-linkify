@@ -23,7 +23,7 @@ function isEmail(email) {
   return re.test(email);
 }
 function findMatches(text) {
-  var pattern = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/ig;
+  var pattern = /(https?:\/\/)?(www\.)?([-a-z0-9@:%_\+~#=]{2,256}\.)+[a-z]{2,6}\/?([-a-z0-9@:%_\\+~#?&/=]*)((\.+([-a-z0-9@:%_\\+~#?&/=]+))*)/ig;
 
   var matches = [];
   var match = void 0;
