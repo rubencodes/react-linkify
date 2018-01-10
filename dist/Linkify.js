@@ -146,13 +146,6 @@ var Linkify = function (_React$Component) {
 }(_react2.default.Component);
 
 Linkify.MATCH = 'LINKIFY_MATCH';
-Linkify.propTypes = {
-  tagName: _react2.default.PropTypes.string,
-  className: _react2.default.PropTypes.string,
-  component: _react2.default.PropTypes.any,
-  children: _react2.default.PropTypes.any,
-  properties: _react2.default.PropTypes.object
-};
 Linkify.defaultProps = {
   tagName: 'span',
   className: 'Linkify',
